@@ -1,0 +1,150 @@
+<html>
+<head>
+<title>Final for submit.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #7a7e85;}
+.s1 { color: #bcbec4;}
+.s2 { color: #cf8e6d;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Final for submit.py</font>
+</center></td></tr></table>
+<pre><span class="s0">#The purpose of the code below is for my final project</span>
+<span class="s0">#The book recommendation script for having better sell</span>
+<span class="s0">#At the beginning I tried to import some librarie</span>
+<span class="s0">#let's import some libraries</span>
+
+<span class="s2">import </span><span class="s1">pandas </span><span class="s2">as </span><span class="s1">pd</span>
+<span class="s2">import </span><span class="s1">numpy </span><span class="s2">as </span><span class="s1">np</span>
+<span class="s2">from </span><span class="s1">jupyterlab</span><span class="s3">.</span><span class="s1">semver </span><span class="s2">import </span><span class="s1">test_set</span>
+<span class="s2">from </span><span class="s1">menuinst</span><span class="s3">.</span><span class="s1">utils </span><span class="s2">import </span><span class="s1">user_is_admin</span>
+<span class="s2">from </span><span class="s1">networkx</span><span class="s3">.</span><span class="s1">algorithms</span><span class="s3">.</span><span class="s1">bipartite</span><span class="s3">.</span><span class="s1">basic </span><span class="s2">import </span><span class="s1">is_bipartite_node_set</span>
+<span class="s2">from </span><span class="s1">numpy</span><span class="s3">.</span><span class="s1">core</span><span class="s3">.</span><span class="s1">defchararray </span><span class="s2">import </span><span class="s1">title</span>
+<span class="s2">from </span><span class="s1">psutil </span><span class="s2">import </span><span class="s1">users</span>
+
+<span class="s0"># I used surprise, it is library for building recommendation systems</span>
+<span class="s2">from </span><span class="s1">surprise </span><span class="s2">import </span><span class="s1">Dataset</span><span class="s3">, </span><span class="s1">Reader</span><span class="s3">, </span><span class="s1">SVD</span>
+<span class="s2">from </span><span class="s1">surprise</span><span class="s3">.</span><span class="s1">model_selection </span><span class="s2">import </span><span class="s1">train_test_split</span>
+<span class="s2">from </span><span class="s1">surprise </span><span class="s2">import </span><span class="s1">accuracy</span>
+<span class="s0">#sklearn helps with text analysis and math</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">feature_extraction</span><span class="s3">.</span><span class="s1">text </span><span class="s2">import </span><span class="s1">TfidfVectorizer</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">metrics</span><span class="s3">.</span><span class="s1">pairwise </span><span class="s2">import </span><span class="s1">linear_kernel</span>
+<span class="s2">import </span><span class="s1">seaborn </span><span class="s2">as </span><span class="s1">sns</span>
+<span class="s2">import </span><span class="s1">matplotlib</span><span class="s3">.</span><span class="s1">pyplot </span><span class="s2">as </span><span class="s1">plt</span>
+<span class="s0">#I chose my dataset from Kaggle</span>
+<span class="s0">#let's import it and load the csv files</span>
+<span class="s0">#In my datasets we have 3 csv files</span>
+<span class="s1">books </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_csv</span><span class="s3">(</span><span class="s4">&quot;Books.csv&quot;</span><span class="s3">, </span><span class="s1">encoding</span><span class="s3">=</span><span class="s4">'latin-1'</span><span class="s3">, </span><span class="s1">low_memory</span><span class="s3">=</span><span class="s2">False</span><span class="s3">)</span>
+<span class="s1">ratings </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_csv</span><span class="s3">(</span><span class="s4">&quot;Ratings.csv&quot;</span><span class="s3">, </span><span class="s1">encoding</span><span class="s3">=</span><span class="s4">'latin-1'</span><span class="s3">)</span>
+<span class="s1">users </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_csv</span><span class="s3">(</span><span class="s4">&quot;Users.csv&quot;</span><span class="s3">, </span><span class="s1">encoding</span><span class="s3">=</span><span class="s4">'latin-1'</span><span class="s3">)</span>
+<span class="s0">#let's see how many rows and columns are in each file</span>
+<span class="s0">#For showing data shapes(sizes)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Books: </span><span class="s2">{</span><span class="s1">books</span><span class="s3">.</span><span class="s1">shape</span><span class="s2">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Ratings: </span><span class="s2">{</span><span class="s1">ratings</span><span class="s3">.</span><span class="s1">shape</span><span class="s2">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Users: </span><span class="s2">{</span><span class="s1">users</span><span class="s3">.</span><span class="s1">shape</span><span class="s2">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+<span class="s0">#For cleaning the Data</span>
+<span class="s0">#I have to remove any repeated data to avoid confusion</span>
+<span class="s1">books </span><span class="s3">= </span><span class="s1">books</span><span class="s3">.</span><span class="s1">drop_duplicates</span><span class="s3">()</span>
+<span class="s1">ratings </span><span class="s3">= </span><span class="s1">ratings</span><span class="s3">.</span><span class="s1">drop_duplicates</span><span class="s3">()</span>
+<span class="s1">users </span><span class="s3">= </span><span class="s1">users</span><span class="s3">.</span><span class="s1">drop_duplicates</span><span class="s3">()</span>
+<span class="s0">#It is important to remove any books that do not have Title or ISBN</span>
+<span class="s1">books </span><span class="s3">= </span><span class="s1">books</span><span class="s3">.</span><span class="s1">dropna</span><span class="s3">(</span><span class="s1">subset</span><span class="s3">=[</span><span class="s4">&quot;ISBN&quot;</span><span class="s3">, </span><span class="s4">&quot;Book-Title&quot;</span><span class="s3">])</span>
+<span class="s0">#It is important to keep only useful columns we need from the dataset</span>
+<span class="s1">books</span><span class="s3">[[</span><span class="s4">&quot;ISBN&quot;</span><span class="s3">, </span><span class="s4">&quot;Book-Title&quot;</span><span class="s3">, </span><span class="s4">&quot;Book-Author&quot;</span><span class="s3">, </span><span class="s4">&quot;Year-Of-Publication&quot;</span><span class="s3">]]</span>
+<span class="s1">users </span><span class="s3">= </span><span class="s1">users</span><span class="s3">[[</span><span class="s4">&quot;User-ID&quot;</span><span class="s3">, </span><span class="s4">&quot;Location&quot;</span><span class="s3">, </span><span class="s4">&quot;Age&quot;</span><span class="s3">]]</span>
+<span class="s0">#It is also important to fill missing ages with the middle value, then remove any user with unrealistic age.</span>
+<span class="s0">#I mean below 5 or above 100</span>
+<span class="s0">#so,</span>
+<span class="s1">users</span><span class="s3">[</span><span class="s4">&quot;Age&quot;</span><span class="s3">] = </span><span class="s1">users</span><span class="s3">[</span><span class="s4">&quot;Age&quot;</span><span class="s3">].</span><span class="s1">fillna</span><span class="s3">(</span><span class="s1">users</span><span class="s3">[</span><span class="s4">&quot;Age&quot;</span><span class="s3">].</span><span class="s1">median</span><span class="s3">())</span>
+<span class="s1">users </span><span class="s3">= </span><span class="s1">users</span><span class="s3">[(</span><span class="s1">users</span><span class="s3">[</span><span class="s4">&quot;Age&quot;</span><span class="s3">] &gt; </span><span class="s5">5</span><span class="s3">) &amp; (</span><span class="s1">users</span><span class="s3">[</span><span class="s4">&quot;Age&quot;</span><span class="s3">] &lt; </span><span class="s5">100</span><span class="s3">)]</span>
+<span class="s0">#Let's combine the ratings and book info into one table</span>
+<span class="s0"># I mean by using the ISBN number to match them</span>
+<span class="s1">merged_df </span><span class="s3">= </span><span class="s1">ratings</span><span class="s3">.</span><span class="s1">merge</span><span class="s3">(</span><span class="s1">books</span><span class="s3">, </span><span class="s1">on</span><span class="s3">=</span><span class="s4">&quot;ISBN&quot;</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Merged data: </span><span class="s2">{</span><span class="s1">merged_df</span><span class="s3">.</span><span class="s1">shape</span><span class="s2">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+<span class="s0">#Let's build collaborative Filtering using surprise library</span>
+<span class="s0">#It is important to tell surprise what data format we are using</span>
+<span class="s0">#I mean user ID, book ID, and rating between 1 and 10</span>
+<span class="s1">reader </span><span class="s3">= </span><span class="s1">Reader</span><span class="s3">(</span><span class="s1">rating_scale</span><span class="s3">=(</span><span class="s5">1</span><span class="s3">, </span><span class="s5">10</span><span class="s3">))</span>
+<span class="s1">data </span><span class="s3">= </span><span class="s1">Dataset</span><span class="s3">.</span><span class="s1">load_from_df</span><span class="s3">(</span><span class="s1">merged_df</span><span class="s3">[[</span><span class="s4">&quot;User-ID&quot;</span><span class="s3">, </span><span class="s4">&quot;ISBN&quot;</span><span class="s3">, </span><span class="s4">&quot;Book-Rating&quot;</span><span class="s3">]], </span><span class="s1">reader</span><span class="s3">)</span>
+<span class="s0">#Based on our aggrement I split data</span>
+<span class="s0">#I mean 80% for training the model and 20% for testing</span>
+<span class="s1">trainset</span><span class="s3">, </span><span class="s1">testset</span><span class="s3">= </span><span class="s1">train_test_split</span><span class="s3">(</span><span class="s1">data</span><span class="s3">, </span><span class="s1">test_size</span><span class="s3">=</span><span class="s5">0.2</span><span class="s3">, </span><span class="s1">random_state</span><span class="s3">=</span><span class="s5">42</span><span class="s3">)</span>
+<span class="s0">#It is better to use an algorithm called SVD to learn from the training data</span>
+<span class="s1">algo </span><span class="s3">= </span><span class="s1">SVD</span><span class="s3">()</span>
+<span class="s1">algo</span><span class="s3">.</span><span class="s1">fit</span><span class="s3">(</span><span class="s1">trainset</span><span class="s3">)</span>
+<span class="s0">#Let's test how good the model is using RMSE and MAE</span>
+<span class="s0"># The important point is: smaller values mean better predictions</span>
+<span class="s1">predictions </span><span class="s3">= </span><span class="s1">algo</span><span class="s3">.</span><span class="s1">test</span><span class="s3">(</span><span class="s1">testset</span><span class="s3">)</span>
+<span class="s1">rmse </span><span class="s3">= </span><span class="s1">accuracy</span><span class="s3">.</span><span class="s1">rmse</span><span class="s3">(</span><span class="s1">predictions</span><span class="s3">, </span><span class="s1">verbose</span><span class="s3">=</span><span class="s2">False</span><span class="s3">)</span>
+<span class="s1">mae </span><span class="s3">= </span><span class="s1">accuracy</span><span class="s3">.</span><span class="s1">mae</span><span class="s3">(</span><span class="s1">predictions</span><span class="s3">, </span><span class="s1">verbose</span><span class="s3">=</span><span class="s2">False</span><span class="s3">)</span>
+<span class="s0"># It it time to recommend Books to a user</span>
+<span class="s0">#First i get a list of books the user has not rated yet</span>
+<span class="s0">#so,</span>
+<span class="s1">user_id </span><span class="s3">= </span><span class="s5">120548</span>
+<span class="s1">user_books </span><span class="s3">= </span><span class="s1">merged_df</span><span class="s3">[</span><span class="s1">merged_df</span><span class="s3">[</span><span class="s4">&quot;User-ID&quot;</span><span class="s3">] == </span><span class="s1">user_id</span><span class="s3">][</span><span class="s4">&quot;ISBN&quot;</span><span class="s3">].</span><span class="s1">unique</span><span class="s3">()</span>
+<span class="s1">all_books </span><span class="s3">= </span><span class="s1">books</span><span class="s3">[</span><span class="s4">&quot;ISBN&quot;</span><span class="s3">].</span><span class="s1">unique</span><span class="s3">()</span>
+<span class="s1">unseen_books</span><span class="s3">= [</span><span class="s1">book </span><span class="s2">for </span><span class="s1">book </span><span class="s2">in </span><span class="s1">all_books </span><span class="s2">if </span><span class="s1">book </span><span class="s2">not in </span><span class="s1">user_books</span><span class="s3">]</span>
+<span class="s0">#Predict how much the user would like each of those books</span>
+<span class="s1">preds </span><span class="s3">= []</span>
+<span class="s2">for </span><span class="s1">book </span><span class="s2">in </span><span class="s1">unseen_books</span><span class="s3">:</span>
+    <span class="s1">pred </span><span class="s3">= </span><span class="s1">algo</span><span class="s3">.</span><span class="s1">predict</span><span class="s3">(</span><span class="s1">user_id</span><span class="s3">, </span><span class="s1">book</span><span class="s3">)</span>
+    <span class="s1">preds</span><span class="s3">.</span><span class="s1">append</span><span class="s3">((</span><span class="s1">book</span><span class="s3">, </span><span class="s1">pred</span><span class="s3">.</span><span class="s1">est</span><span class="s3">))</span>
+<span class="s0">#Let's sort predictions from best to worst and pick the top 5</span>
+<span class="s1">preds</span><span class="s3">.</span><span class="s1">sort</span><span class="s3">(</span><span class="s1">key</span><span class="s3">=</span><span class="s2">lambda </span><span class="s1">x</span><span class="s3">: </span><span class="s1">x</span><span class="s3">[</span><span class="s5">1</span><span class="s3">], </span><span class="s1">reverse</span><span class="s3">=</span><span class="s2">True</span><span class="s3">)</span>
+<span class="s1">top5 </span><span class="s3">= </span><span class="s1">preds</span><span class="s3">[:</span><span class="s5">5</span><span class="s3">]</span>
+<span class="s0"># showing the top 5 recommended books for the user with predicted scores</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s2">\n</span><span class="s4">📘📘📘Recommendation for user </span><span class="s2">{</span><span class="s1">user_id</span><span class="s2">}</span><span class="s4">:&quot;</span><span class="s3">)</span>
+<span class="s2">for </span><span class="s1">isbn</span><span class="s3">, </span><span class="s1">rating </span><span class="s2">in </span><span class="s1">top5</span><span class="s3">:</span>
+    <span class="s1">title </span><span class="s3">= </span><span class="s1">books</span><span class="s3">[</span><span class="s1">books</span><span class="s3">[</span><span class="s4">&quot;ISBN&quot;</span><span class="s3">] == </span><span class="s1">isbn</span><span class="s3">][</span><span class="s4">&quot;Book-Title&quot;</span><span class="s3">].</span><span class="s1">values</span><span class="s3">[</span><span class="s5">0</span><span class="s3">]</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s2">{</span><span class="s1">title</span><span class="s2">}</span><span class="s4">: </span><span class="s2">{</span><span class="s1">rating</span><span class="s2">:</span><span class="s4">.2f</span><span class="s2">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+<span class="s0">#Let's talk about Content based filtering using the book info</span>
+<span class="s0">#Following this, I am comibing the book title and author name into one string for each book</span>
+<span class="s0">#It is so important to have a string</span>
+<span class="s1">books</span><span class="s3">[</span><span class="s4">'combined'</span><span class="s3">] = </span><span class="s1">books</span><span class="s3">[</span><span class="s4">'Book-Title'</span><span class="s3">].</span><span class="s1">fillna</span><span class="s3">(</span><span class="s4">''</span><span class="s3">) + </span><span class="s1">books</span><span class="s3">[</span><span class="s4">'Book-Author'</span><span class="s3">].</span><span class="s1">fillna</span><span class="s3">(</span><span class="s4">''</span><span class="s3">)</span>
+<span class="s0">#We have learned TF-IDF method so,</span>
+<span class="s0">#I converted all book text into numbers using TF-IDF ,</span>
+<span class="s0"># It is important to know common words like &quot;the&quot; are ignored</span>
+<span class="s1">tfidf </span><span class="s3">= </span><span class="s1">TfidfVectorizer</span><span class="s3">(</span><span class="s1">stop_words</span><span class="s3">=</span><span class="s4">'english'</span><span class="s3">)</span>
+<span class="s1">tfidf_matrix </span><span class="s3">= </span><span class="s1">tfidf</span><span class="s3">.</span><span class="s1">fit_transform</span><span class="s3">(</span><span class="s1">books</span><span class="s3">[</span><span class="s4">'combined'</span><span class="s3">])</span>
+<span class="s0">#Then, I measured similarity between all books</span>
+<span class="s0">#I mean that how close their text is</span>
+<span class="s0">#so,</span>
+<span class="s1">cosine_sim </span><span class="s3">= </span><span class="s1">linear_kernel</span><span class="s3">(</span><span class="s1">tfidf_matrix</span><span class="s3">, </span><span class="s1">tfidf_matrix</span><span class="s3">)</span>
+<span class="s0">#8-Recommend similar books</span>
+<span class="s0">#Let's define a function: you give it a book title, it returns other similar books</span>
+<span class="s2">def </span><span class="s1">get_content_recommendations</span><span class="s3">(</span><span class="s1">title</span><span class="s3">, </span><span class="s1">cosine_sim</span><span class="s3">, </span><span class="s1">books_df</span><span class="s3">=</span><span class="s1">books</span><span class="s3">, </span><span class="s1">top_n</span><span class="s3">=</span><span class="s5">5</span><span class="s3">):</span>
+    <span class="s1">indices </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">Series</span><span class="s3">(</span><span class="s1">books_df</span><span class="s3">.</span><span class="s1">index</span><span class="s3">, </span><span class="s1">index</span><span class="s3">=</span><span class="s1">books_df</span><span class="s3">[</span><span class="s4">&quot;Book-Title&quot;</span><span class="s3">]).</span><span class="s1">drop_duplicates</span><span class="s3">()</span>
+    <span class="s1">idx </span><span class="s3">= </span><span class="s1">indices</span><span class="s3">.</span><span class="s1">get</span><span class="s3">[</span><span class="s1">title</span><span class="s3">]</span>
+    <span class="s2">if </span><span class="s1">idx </span><span class="s2">is None</span><span class="s3">:</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Book '</span><span class="s2">{</span><span class="s1">title</span><span class="s2">}</span><span class="s4">' not found in dataset.&quot;</span><span class="s3">)</span>
+        <span class="s2">return</span><span class="s3">[]</span>
+    <span class="s1">sim_scores </span><span class="s3">= </span><span class="s1">list</span><span class="s3">(</span><span class="s1">enumerate</span><span class="s3">(</span><span class="s1">cosine_sim</span><span class="s3">[</span><span class="s1">idx</span><span class="s3">]))</span>
+    <span class="s1">sim_scores </span><span class="s3">= </span><span class="s1">sorted</span><span class="s3">(</span><span class="s1">sim_scores</span><span class="s3">, </span><span class="s1">key</span><span class="s3">=</span><span class="s2">lambda </span><span class="s1">x</span><span class="s3">: </span><span class="s1">x</span><span class="s3">[</span><span class="s5">1</span><span class="s3">], </span><span class="s1">reverse</span><span class="s3">=</span><span class="s2">True</span><span class="s3">)</span>
+    <span class="s1">sim_scores </span><span class="s3">= </span><span class="s1">sim_scores</span><span class="s3">[</span><span class="s5">1</span><span class="s3">:</span><span class="s1">top_n</span><span class="s3">+</span><span class="s5">1</span><span class="s3">]</span>
+    <span class="s1">book_indices </span><span class="s3">= [</span><span class="s1">i</span><span class="s3">[</span><span class="s5">0</span><span class="s3">] </span><span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">sim_scores</span><span class="s3">]</span>
+    <span class="s2">return </span><span class="s1">book_df</span><span class="s3">[</span><span class="s4">'Book-Title'</span><span class="s3">].</span><span class="s1">iloc</span><span class="s3">[</span><span class="s1">book_indices</span><span class="s3">].</span><span class="s1">tolist</span><span class="s3">()</span>
+<span class="s0">#Let's use that function to get 5 similar books to a specific one</span>
+<span class="s1">example_title </span><span class="s3">= </span><span class="s4">'The Lovely Bones: A Novel'</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s2">\n</span><span class="s4">📗📗📗 Content based Recommendation for '</span><span class="s2">{</span><span class="s1">example_title</span><span class="s2">}</span><span class="s4">':&quot;</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s1">get_content_recommendations</span><span class="s3">(</span><span class="s1">example_title</span><span class="s3">))</span>
+<span class="s0">#9-Visualize Most Rated Books</span>
+<span class="s0">#Following this, count which books were rated the most and show them in a pretty graph</span>
+<span class="s1">top_books </span><span class="s3">= </span><span class="s1">merged_df</span><span class="s3">[</span><span class="s4">'Book-Title'</span><span class="s3">].</span><span class="s1">value_counts</span><span class="s3">().</span><span class="s1">head</span><span class="s3">(</span><span class="s5">10</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">figure</span><span class="s3">(</span><span class="s1">figsize</span><span class="s3">=(</span><span class="s5">10</span><span class="s3">,</span><span class="s5">6</span><span class="s3">))</span>
+<span class="s1">sns</span><span class="s3">.</span><span class="s1">barplot</span><span class="s3">(</span><span class="s1">x</span><span class="s3">=</span><span class="s1">top_books</span><span class="s3">.</span><span class="s1">values</span><span class="s3">, </span><span class="s1">y</span><span class="s3">=</span><span class="s1">top_books</span><span class="s3">.</span><span class="s1">index</span><span class="s3">, </span><span class="s1">palette</span><span class="s3">=</span><span class="s4">'Blues_d'</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">title</span><span class="s3">(</span><span class="s4">&quot;Top 10 Most Rated Books&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">xlabel</span><span class="s3">(</span><span class="s4">&quot;Number of Ratings&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">ylabel</span><span class="s3">(</span><span class="s4">&quot;Book Title&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">tight_layout</span><span class="s3">()</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">show</span><span class="s3">()</span>
+</pre>
+</body>
+</html>
